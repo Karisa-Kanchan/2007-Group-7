@@ -1,81 +1,29 @@
-<!DOCTYPE html>
+Here’s a simple HTML page with a function that adds two numbers:
 
+```html
+<!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Binary Search Tree</title>
+  <meta charset="UTF-8">
+  <title>Add Two Numbers</title>
 </head>
 <body>
-	<h1>Binary Search Tree</h1>
-	<p>Open the browser console to see the traversal results.</p>
+  <input type="number" id="firstNumber" placeholder="First number">
+  <input type="number" id="secondNumber" placeholder="Second number">
+  <button onclick="showSum()">Add</button>
+  <p id="result"></p>
 
-	<script>
-		class Node {
-			constructor(value) {
-				this.value = value;
-				this.left = null;
-				this.right = null;
-			}
-		}
+  <script>
+    function addTwoNumbers(a, b) {
+      return a + b;
+    }
 
-		class BinarySearchTree {
-			constructor() {
-				this.root = null;
-			}
-
-			insert(value) {
-				const node = new Node(value);
-				if (!this.root) {
-					this.root = node;
-					return this;
-				}
-
-				let current = this.root;
-				while (true) {
-					if (value === current.value) return this;
-					if (value < current.value) {
-						if (!current.left) {
-							current.left = node;
-							return this;
-						}
-						current = current.left;
-					} else {
-						if (!current.right) {
-							current.right = node;
-							return this;
-						}
-						current = current.right;
-					}
-				}
-			}
-
-			contains(value) {
-				let current = this.root;
-				while (current) {
-					if (value === current.value) return true;
-					current = value < current.value ? current.left : current.right;
-				}
-				return false;
-			}
-
-			inOrder() {
-				const values = [];
-				const visit = (node) => {
-					if (!node) return;
-					visit(node.left);
-					values.push(node.value);
-					visit(node.right);
-				};
-				visit(this.root);
-				return values;
-			}
-		}
-
-		const tree = new BinarySearchTree();
-		[10, 5, 15, 3, 7, 12, 18].forEach((value) => tree.insert(value));
-		console.log("In-order traversal:", tree.inOrder());
-		console.log("Contains 7:", tree.contains(7));
-	</script>
+    function showSum() {
+      const a = Number(document.getElementById("firstNumber").value);
+      const b = Number(document.getElementById("secondNumber").value);
+      document.getElementById("result").textContent = addTwoNumbers(a, b);
+    }
+  </script>
 </body>
 </html>
+```
