@@ -1,0 +1,32 @@
+{
+  "name": "7a-test",
+  "version": "1.0.0",
+  "description": "ECNG2007 Project 7A LTI Protocol Adapter prototype",
+  "scripts": {
+    "test": "node --test",
+    "start": "node --env-file-if-exists=.env src/mockServer.js",
+    "dev": "node --watch --env-file-if-exists=.env src/mockServer.js",
+    "demo": "node --env-file-if-exists=.env scripts/demo.js",
+    "lti": "node --env-file-if-exists=.env src/ltiServer.js",
+    "register:platform": "node --env-file-if-exists=.env scripts/registerPlatform.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/S-Ramdhani/7a-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/S-Ramdhani/7a-test/issues"
+  },
+  "homepage": "https://github.com/S-Ramdhani/7a-test#readme",
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "ltijs": "^7.0.7"
+  }
+}

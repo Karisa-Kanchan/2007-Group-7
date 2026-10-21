@@ -1,0 +1,14 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: ecng2007-p7a-mongo
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:27017:27017"
+
+    volumes:
+      - p7a-mongo-data:/data/db
+
+volumes:
+  p7a-mongo-data:

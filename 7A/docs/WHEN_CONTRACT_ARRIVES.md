@@ -1,0 +1,11 @@
+# When Contract v1 and the approved fixtures arrive
+
+1. Record the authoritative contract/fixture versions and staff decisions. Resolve the source-document discrepancies in `REPOSITORY_REVIEW.md`; use the parent team's change-control process for changes to baselined interfaces.
+2. Replace the local message version, validators and stub builder in `src/contract.js`. Replace the mapping in `src/normalizeLaunch.js` using published input/output examples. Remove incompatible guessed fields; do not just rename `provisional-0`.
+3. Confirm transport, endpoint/method, response conventions and synchronous versus callback behaviour. Update `src/brokerClient.js`, `src/adapter.js` and the actual shared result entry point. `/api/results` currently exists only in the mock harness.
+4. Implement the approved LTI-facing operation in `src/resultService.js` and connect it in `src/ltiServer.js`. Use ltijs services if appropriate to the confirmed path. Retain any required private launch context separately from displayable traces. Record delivery success only after the operation succeeds.
+5. Update correlation and evidence in `src/launchStore.js` according to the official identifiers. Do not add persistence or retry rules unless required by the demonstration/clarifications.
+6. Populate ignored registration settings for `scripts/registerPlatform.js`; configure the consumer, routes, HTTPS and library settings for the approved environment. `.env.example`/`src/config.js` and README must document those confirmed choices.
+7. Add separately labelled staff fixtures with their source/version. Update `tests/`, `fixtures/`, `scripts/demo.js` and `requests.http`; compare actual outputs with the published expectations rather than with the implementation's own builder.
+8. Execute the submitted SYS-7A-01 through SYS-7A-07 procedures and record build, fixture version, tester/date, actual evidence and result. Keep developer regression results separate. Only baseline pending failure cases after staff clarification.
+9. Coordinate real P7B boundary and parent end-to-end tests using approved Tutor/Web Lab doubles. Update the integrated setup guide and RTM with the parent team; no other student project's implementation should be required.

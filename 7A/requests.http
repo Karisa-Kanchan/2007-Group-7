@@ -1,0 +1,78 @@
+@baseUrl = http://localhost:3000
+
+### Health check
+GET {{baseUrl}}/health
+
+
+### Valid launch
+POST {{baseUrl}}/dev/launch
+Content-Type: application/json
+
+{
+  "iss": "https://test-platform.example.edu",
+  "sub": "student-123",
+  "name": "Test Student",
+  "roles": ["Learner"],
+  "context": {
+    "id": "course-ecng2007",
+    "label": "ECNG2007"
+  },
+  "resourceLink": {
+    "id": "resource-link-demo-01",
+    "title": "Project 7 Demo Activity"
+  },
+  "custom": {
+    "activity_id": "activity-demo-01"
+  }
+}
+
+
+### Full 7A -> fake 7B -> 7A
+POST {{baseUrl}}/dev/demo
+Content-Type: application/json
+
+{
+  "iss": "https://test-platform.example.edu",
+  "sub": "student-123",
+  "name": "Test Student",
+  "roles": ["Learner"],
+  "context": {
+    "id": "course-ecng2007",
+    "label": "ECNG2007"
+  },
+  "resourceLink": {
+    "id": "resource-link-demo-01",
+    "title": "Project 7 Demo Activity"
+  },
+  "custom": {
+    "activity_id": "activity-demo-01"
+  }
+}
+
+
+### Invalid launch
+POST {{baseUrl}}/dev/launch
+Content-Type: application/json
+
+{
+  "iss": "https://test-platform.example.edu",
+  "name": "Missing identifiers"
+}
+
+### Provisional result input (replace launchId with one from /dev/launch)
+# All requests in this file are unauthenticated local developer examples.
+# They do not execute SYS-7A cases or perform an approved LTI result return.
+POST {{baseUrl}}/api/results
+Content-Type: application/json
+
+{
+  "contractVersion": "provisional-0",
+  "launchId": "replace-with-returned-launch-id",
+  "activityId": "activity-demo-01",
+  "userId": "student-123",
+  "status": "completed",
+  "message": "Local result example"
+}
+
+### Local launch/result evidence (replace ID)
+GET {{baseUrl}}/trace/replace-with-returned-launch-id

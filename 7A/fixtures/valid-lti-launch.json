@@ -1,0 +1,20 @@
+{
+  "iss": "https://test-platform.example.edu",
+  "sub": "student-123",
+  "name": "Test Student",
+  "roles": [
+    "Learner"
+  ],
+  "context": {
+    "id": "course-ecng2007",
+    "label": "ECNG2007",
+    "title": "Software Development Lifecycle"
+  },
+  "resourceLink": {
+    "id": "resource-link-demo-01",
+    "title": "Project 7 Demo Activity"
+  },
+  "custom": {
+    "activity_id": "activity-demo-01"
+  }
+}
