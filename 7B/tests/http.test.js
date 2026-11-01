@@ -390,3 +390,37 @@ test('POST /launch handles a target network failure', async (t) => {
     assert.equal(result.status, 502);
     assert.equal(result.body.error, 'Target dispatch failed');
 });
+
+test('POST /launch does not dispatch an invalid launch', async (t) => {
+    const baseUrl = await startServer(t);
+
+    let targetWasCalled = false;
+
+    mockTargetFetch(t, async () => {
+        targetWasCalled = true;
+
+        return Response.json({
+            status: 'completed'
+        });
+    });
+
+    const result = await postLaunch(baseUrl, {
+        ...validLaunch,
+        user: {
+            id: ''
+        }
+    });
+
+    assert.equal(result.status, 400);
+    assert.equal(result.body.error, 'Invalid launch');
+
+    assert.ok(
+        result.body.details.includes('user.id is required.')
+    );
+
+    assert.equal(
+        targetWasCalled,
+        false,
+        'An invalid launch must not reach a learning-tool target'
+    );
+});
