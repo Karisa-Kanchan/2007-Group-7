@@ -3,6 +3,7 @@ const express = require('express');
 const { findActivity, getAllActivities } = require('./registry');
 const { dispatchActivity } = require('./broker');
 const { normalizeResult } = require('./resultNormalizer');
+const { validateLaunch } = require('./launchValidator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,18 +43,17 @@ app.get('/activities/:activityId', (req, res) => {
 app.post('/launch', async (req, res) => {
     const launch = req.body;
 
-    // Check for a valid launch object and activity identifier.
-    if (
-        !launch ||
-        typeof launch !== 'object' ||
-        Array.isArray(launch) ||
-        typeof launch.activityId !== 'string' ||
-        launch.activityId.trim() === ''
-    ) {
+    
+    // Validate the provisional launch before any target dispatch.
+    const validation = validateLaunch(launch);
+
+    if (!validation.valid) {
         return res.status(400).json({
-            error: 'Invalid launch: activityId is required'
+            error: 'Invalid launch',
+            details: validation.errors
         });
     }
+
 
     // Resolve the requested activity.
     const activity = findActivity(launch.activityId);
@@ -65,7 +65,7 @@ app.post('/launch', async (req, res) => {
     }
 
     try {
-        // Dispatch the launch to its configured target.
+    // Dispatch the launch to its configured target.
        
     const targetResult = await dispatchActivity(
         launch.activityId,

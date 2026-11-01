@@ -52,7 +52,7 @@ async function postLaunch(baseUrl, launch) {
     };
 }
 
-// Replace outgoing target requests without mocking
+// Mock outgoing target requests without intercepting
 // requests sent to the actual P7B HTTP server.
 function mockTargetFetch(t, handler) {
     const originalFetch = global.fetch;
@@ -154,16 +154,20 @@ test('POST /launch rejects a missing activity ID', async (t) => {
     const baseUrl = await startServer(t);
 
     const result = await postLaunch(baseUrl, {
+        contractVersion: 'provisional-0',
         launchId: 'launch-002',
         user: {
             id: 'student-123'
+        },
+        resource: {
+            id: 'resource-link-demo-01'
         }
     });
 
     assert.equal(result.status, 400);
-    assert.equal(
-        result.body.error,
-        'Invalid launch: activityId is required'
+    assert.equal(result.body.error, 'Invalid launch');
+    assert.ok(
+        result.body.details.includes('activityId is required.')
     );
 });
 
@@ -176,9 +180,9 @@ test('POST /launch rejects an empty activity ID', async (t) => {
     });
 
     assert.equal(result.status, 400);
-    assert.equal(
-        result.body.error,
-        'Invalid launch: activityId is required'
+    assert.equal(result.body.error, 'Invalid launch');
+    assert.ok(
+        result.body.details.includes('activityId is required.')
     );
 });
 
@@ -188,9 +192,9 @@ test('POST /launch rejects a non-object launch', async (t) => {
     const result = await postLaunch(baseUrl, []);
 
     assert.equal(result.status, 400);
-    assert.equal(
-        result.body.error,
-        'Invalid launch: activityId is required'
+    assert.equal(result.body.error, 'Invalid launch');
+    assert.ok(
+        result.body.details.includes('Launch must be an object.')
     );
 });
 
@@ -305,8 +309,7 @@ test('POST /launch rejects a mismatched target launch ID', async (t) => {
 
     const result = await postLaunch(baseUrl, validLaunch);
 
-    // Current provisional server handling maps normaliser
-    // errors to HTTP 502.
+    // The provisional server maps normalisation errors to HTTP 502.
     assert.equal(result.status, 502);
     assert.equal(result.body.error, 'Target dispatch failed');
 });
