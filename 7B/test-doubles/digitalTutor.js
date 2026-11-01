@@ -11,7 +11,11 @@ app.post('/launch', (req, res) => {
     console.log('Digital Tutor received:', req.body);
 
     res.status(200).json({
-        message: 'Digital Tutor test double received launch'
+        launchId: req.body.launchId,
+        activityId: req.body.activityId,
+        userId: req.body.user?.id,
+        status: 'completed',
+        message: 'Digital Tutor activity completed successfully'
     });
 });
 

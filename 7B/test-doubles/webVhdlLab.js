@@ -10,9 +10,15 @@ app.use(express.json());
 app.post('/launch', (req, res) => {
     console.log('Web VHDL Lab received:', req.body);
 
+   
     res.status(200).json({
-        message: 'Web VHDL Lab test double received launch'
+        launchId: req.body.launchId,
+        activityId: req.body.activityId,
+        userId: req.body.user?.id,
+        status: 'completed',
+        message: 'Web VHDL Lab activity completed successfully'
     });
+
 });
 
 app.listen(PORT, () => {

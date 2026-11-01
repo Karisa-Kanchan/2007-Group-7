@@ -2,6 +2,7 @@
 const express = require('express');
 const { findActivity, getAllActivities } = require('./registry');
 const { dispatchActivity } = require('./broker');
+const { normalizeResult } = require('./resultNormalizer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -65,13 +66,20 @@ app.post('/launch', async (req, res) => {
 
     try {
         // Dispatch the launch to its configured target.
-        const result = await dispatchActivity(
-            launch.activityId,
-            launch
-        );
+       
+    const targetResult = await dispatchActivity(
+        launch.activityId,
+        launch
+    );
 
-        // Return the target's provisional response.
-        return res.status(200).json(result);
+    // Convert the target's response into a normalised result.
+    const normalizedResult = normalizeResult(
+        launch,
+        targetResult
+    );
+
+        return res.status(200).json(normalizedResult);
+
     } catch (error) {
         console.error('Launch dispatch failed:', error.message);
 
