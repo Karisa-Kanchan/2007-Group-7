@@ -89,8 +89,14 @@ app.post('/launch', async (req, res) => {
     }
 });
 
-// Start the server.
-app.listen(PORT, () => {
-    console.log(`P7B server running at http://localhost:${PORT}`);
-});
+
+ // Start the server only when this file is run directly.
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`P7B server running at http://localhost:${PORT}`);
+    });
+}
+
+// Allow automated tests to import the Express application.
+module.exports = { app };
 
