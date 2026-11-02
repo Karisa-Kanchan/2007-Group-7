@@ -111,3 +111,53 @@ test('rejects a target result with a mismatched user ID', () => {
         }
     );
 });
+
+test('normalises an incomplete activity result', () => {
+    const launch = {
+        contractVersion: 'provisional-0',
+        launchId: 'launch-incomplete-001',
+        activityId: 'digital-logic-lesson',
+        user: {
+            id: 'student-123'
+        }
+    };
+
+    const targetResult = {
+        status: 'incomplete',
+        message: 'Activity is not yet complete'
+    };
+
+    const result = normalizeResult(launch, targetResult);
+
+    assert.equal(result.contractVersion, 'provisional-0');
+    assert.equal(result.launchId, 'launch-incomplete-001');
+    assert.equal(result.activityId, 'digital-logic-lesson');
+    assert.equal(result.userId, 'student-123');
+    assert.equal(result.status, 'incomplete');
+    assert.equal(result.message, 'Activity is not yet complete');
+});
+
+test('normalises a failed activity result', () => {
+    const launch = {
+        contractVersion: 'provisional-0',
+        launchId: 'launch-failed-001',
+        activityId: 'digital-logic-lesson',
+        user: {
+            id: 'student-123'
+        }
+    };
+
+    const targetResult = {
+        status: 'failed',
+        message: 'Activity execution failed'
+    };
+
+    const result = normalizeResult(launch, targetResult);
+
+    assert.equal(result.contractVersion, 'provisional-0');
+    assert.equal(result.launchId, 'launch-failed-001');
+    assert.equal(result.activityId, 'digital-logic-lesson');
+    assert.equal(result.userId, 'student-123');
+    assert.equal(result.status, 'failed');
+    assert.equal(result.message, 'Activity execution failed');
+});

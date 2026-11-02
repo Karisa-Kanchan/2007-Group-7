@@ -81,7 +81,13 @@ app.post('/launch', async (req, res) => {
         return res.status(200).json(normalizedResult);
 
     } catch (error) {
-        console.error('Launch dispatch failed:', error.message);
+    console.error('Launch dispatch failed:', error.message);
+
+        if (error.name === 'TimeoutError') {
+            return res.status(504).json({
+                error: 'Target request timed out'
+            });
+        }
 
         return res.status(502).json({
             error: 'Target dispatch failed'

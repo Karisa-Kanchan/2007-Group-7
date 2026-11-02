@@ -144,3 +144,42 @@ test('rejects a target response with an HTTP error', async (t) => {
         }
     );
 });
+
+test('rejects a target request that times out', async (t) => {
+    const originalFetch = global.fetch;
+
+    global.fetch = async (url, options) => {
+        assert.equal(
+            url,
+            'http://localhost:4001/launch'
+        );
+
+        assert.ok(
+            options.signal,
+            'Target requests must include a timeout signal'
+        );
+
+        // Simulate a request that was aborted by the timeout.
+        throw new DOMException(
+            'The operation was aborted due to timeout',
+            'TimeoutError'
+        );
+    };
+
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    await assert.rejects(
+        dispatchActivity('digital-logic-lesson', {
+            launchId: 'launch-timeout-001',
+            activityId: 'digital-logic-lesson',
+            user: {
+                id: 'student-123'
+            }
+        }),
+        {
+            name: 'TimeoutError'
+        }
+    );
+});

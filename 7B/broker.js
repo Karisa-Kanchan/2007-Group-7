@@ -1,7 +1,10 @@
 
 const { findActivity } = require('./registry');
 
-// Dispatch an activity launch to its registered target.
+// Maximum time allowed for a target to respond.
+const TARGET_TIMEOUT_MS = 10000;
+
+// Dispatch a launch to the configured learning-tool target.
 async function dispatchActivity(activityId, launchData) {
     const activity = findActivity(activityId);
 
@@ -9,25 +12,22 @@ async function dispatchActivity(activityId, launchData) {
         throw new Error(`Activity not registered: ${activityId}`);
     }
 
-    const targetUrl = `${activity.targetUrl}/launch`;
-
-    const response = await fetch(targetUrl, {
+    const response = await fetch(`${activity.targetUrl}/launch`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(launchData)
+        body: JSON.stringify(launchData),
+
+        // Abort the request if the target takes too long.
+        signal: AbortSignal.timeout(TARGET_TIMEOUT_MS)
     });
 
     if (!response.ok) {
-        throw new Error(
-            `Target returned HTTP ${response.status}`
-        );
+        throw new Error(`Target returned HTTP ${response.status}`);
     }
 
-    return await response.json();
+    return response.json();
 }
 
-module.exports = {
-    dispatchActivity
-};
+module.exports = { dispatchActivity };

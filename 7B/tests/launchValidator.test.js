@@ -87,3 +87,28 @@ test('rejects a non-object launch', () => {
     assert.equal(result.valid, false);
     assert.ok(result.errors.includes('Launch must be an object.'));
 });
+
+test('accepts a launch without an optional user name', () => {
+    const result = validateLaunch({
+        ...validLaunch,
+        user: {
+            id: 'student-123'
+        }
+    });
+
+    assert.equal(result.valid, true);
+    assert.deepEqual(result.errors, []);
+});
+
+test('accepts a launch with a null user name', () => {
+    const result = validateLaunch({
+        ...validLaunch,
+        user: {
+            id: 'student-123',
+            name: null
+        }
+    });
+
+    assert.equal(result.valid, true);
+    assert.deepEqual(result.errors, []);
+});

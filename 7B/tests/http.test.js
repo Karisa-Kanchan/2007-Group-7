@@ -424,3 +424,24 @@ test('POST /launch does not dispatch an invalid launch', async (t) => {
         'An invalid launch must not reach a learning-tool target'
     );
 });
+
+test('POST /launch returns HTTP 504 when the target times out', async (t) => {
+    const baseUrl = await startServer(t);
+
+    mockTargetFetch(t, async (url, options) => {
+        assert.ok(
+            options.signal,
+            'Target requests must have a timeout signal'
+        );
+
+        throw new DOMException(
+            'The target request timed out',
+            'TimeoutError'
+        );
+    });
+
+    const result = await postLaunch(baseUrl, validLaunch);
+
+    assert.equal(result.status, 504);
+    assert.equal(result.body.error, 'Target request timed out');
+});
