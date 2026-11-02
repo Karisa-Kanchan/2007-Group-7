@@ -1,10 +1,15 @@
 # Project 7B — System Test Execution Record
 
-**Date:** 2 November 2026  
-**Component:** Activity Registry & Target Broker (7B)  
-**Branch:** `7B`  
-**Test basis:** *ECNG2007 Project 7 — System Test Baseline v0.0.1*, SYS-7B-01 through SYS-7B-09  
-**Implementation contract:** `provisional-0` (joint 7A–7B design; final sign-off pending)  
+**Date:** 2 November 2026
+
+**Component:** Activity Registry & Target Broker (7B)
+
+**Branch:** `7B`
+
+**Test basis:** *ECNG2007 Project 7 — System Test Baseline v0.0.1*, SYS-7B-01 through SYS-7B-09
+
+**Implementation contract:** `provisional-0` (joint 7A–7B design; final sign-off pending)
+
 **Execution environment:** Windows 11, Node.js/Express, 7B HTTP server on `localhost:3000`; Digital Tutor test double on `localhost:4001`; Web VHDL Lab test double on `localhost:4002`.
 
 ## Acceptance qualification
