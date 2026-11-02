@@ -40,3 +40,70 @@ test('returns all configured activities', () => {
     assert.ok(targetTypes.includes('digital-tutor'));
     assert.ok(targetTypes.includes('web-vhdl-lab'));
 });
+
+const { validateRegistry } = require('../registry');
+
+const validActivity = {
+    id: 'test-activity',
+    targetType: 'digital-tutor',
+    targetUrl: 'http://localhost:4001'
+};
+
+test('accepts a valid activity registry', () => {
+    assert.equal(validateRegistry([validActivity]), true);
+});
+
+test('rejects a registry that is not an array', () => {
+    assert.throws(
+        () => validateRegistry(null),
+        /Activity registry must be an array/
+    );
+});
+
+test('rejects an activity without an ID', () => {
+    assert.throws(
+        () => validateRegistry([{ ...validActivity, id: '' }]),
+        /Missing activity ID/
+    );
+});
+
+test('rejects duplicate activity IDs', () => {
+    assert.throws(
+        () => validateRegistry([validActivity, { ...validActivity }]),
+        /Duplicate activity ID/
+    );
+});
+
+test('rejects an unsupported target type', () => {
+    assert.throws(
+        () => validateRegistry([
+            { ...validActivity, targetType: 'unknown-tool' }
+        ]),
+        /Unsupported target type/
+    );
+});
+
+test('rejects a malformed target URL', () => {
+    assert.throws(
+        () => validateRegistry([
+            { ...validActivity, targetUrl: 'not-a-url' }
+        ]),
+        /Invalid target URL/
+    );
+});
+
+test('rejects an unsupported URL protocol', () => {
+    assert.throws(
+        () => validateRegistry([
+            { ...validActivity, targetUrl: 'ftp://localhost:4001' }
+        ]),
+        /Unsupported target URL protocol/
+    );
+});
+
+test('rejects a non-object activity entry', () => {
+    assert.throws(
+        () => validateRegistry([null]),
+        /Invalid activity/
+    );
+});
