@@ -1,3 +1,4 @@
+
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { config } from '../src/config.js'
@@ -69,6 +70,60 @@ test(
     assert.ok(result.launchId)
   }
 )
+
+test('custom activity ID overrides a resource mapping', t => {
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  config.activityResourceMap = { 'resource-1': 'mapped-activity' }
+
+  const result = normalizeLaunch(validLaunch)
+  assert.equal(result.activityId, 'activity-1')
+  assert.equal(result.resource.id, 'resource-1')
+})
+
+test('uses a configured resource mapping when custom ID is missing', t => {
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  config.activityResourceMap = { 'resource-1': 'digital-logic-lesson' }
+
+  const result = normalizeLaunch({ ...validLaunch, custom: {} })
+  assert.equal(result.activityId, 'digital-logic-lesson')
+  assert.equal(result.resource.id, 'resource-1')
+})
+
+test('rejects missing custom ID when no resource mapping exists', t => {
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  config.activityResourceMap = {}
+
+  const response = acceptLaunch({ ...validLaunch, custom: {} })
+  assert.equal(response.ok, false)
+  assert.equal(response.statusCode, 400)
+  assert.equal(response.error, 'INVALID_OR_UNSUPPORTED_LAUNCH')
+})
+
+test('does not treat rawLaunch.activityId as an authorized fallback', t => {
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  config.activityResourceMap = {}
+
+  assert.throws(() => normalizeLaunch({
+    ...validLaunch,
+    custom: {},
+    activityId: 'unverified-activity'
+  }), /activity identifier/)
+})
+
+test('rejects a malformed custom activity identifier', t => {
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  config.activityResourceMap = { 'resource-1': 'mapped-activity' }
+
+  assert.throws(() => normalizeLaunch({
+    ...validLaunch,
+    custom: { activity_id: 42 }
+  }), /custom activity identifier/)
+})
 
 test(
   'rejects launch without user id',

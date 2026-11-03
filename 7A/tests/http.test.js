@@ -1,3 +1,4 @@
+
 // Local transport regression tests. The endpoints/status codes are provisional.
 import test from 'node:test'
 import assert from 'node:assert/strict'
@@ -8,7 +9,7 @@ import { config } from '../src/config.js'
 import { createStubResult } from '../src/contract.js'
 import { clearLaunches } from '../src/launchStore.js'
 
-const launch = { sub: 'student-1', resourceLink: { id: 'resource-1' } }
+const launch = { sub: 'student-1', resourceLink: { id: 'resource-1' }, custom: { activity_id: 'activity-1' } }
 
 async function listen(app, t) {
   const server = app.listen(0, '127.0.0.1')
@@ -75,4 +76,23 @@ test('HTTP broker consumes the normalized launch; failures and swapped replies a
   const swapped = await post(base, '/dev/demo', launch)
   assert.equal(swapped.status, 409)
   assert.equal(swapped.body.error, 'LAUNCH_MISMATCH')
+})
+
+test('HTTP launch uses configured fallback and rejects missing mappings', async t => {
+  clearLaunches()
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  const base = await listen(app, t)
+  const noCustom = { ...launch, custom: {} }
+
+  config.activityResourceMap = { 'resource-1': 'digital-logic-lesson' }
+  const mapped = await post(base, '/dev/launch', noCustom)
+  assert.equal(mapped.status, 200)
+  assert.equal(mapped.body.normalizedLaunch.activityId, 'digital-logic-lesson')
+  assert.equal(mapped.body.normalizedLaunch.resource.id, 'resource-1')
+
+  config.activityResourceMap = {}
+  const rejected = await post(base, '/dev/launch', noCustom)
+  assert.equal(rejected.status, 400)
+  assert.equal(rejected.body.error, 'INVALID_OR_UNSUPPORTED_LAUNCH')
 })

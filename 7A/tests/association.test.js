@@ -1,7 +1,9 @@
+
 // Developer regression tests using synthetic data, not SYS-7A execution.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { acceptLaunch } from '../src/adapter.js'
+import { config } from '../src/config.js'
 import { normalizeLaunch, rawLaunchFromLtijsContext } from '../src/normalizeLaunch.js'
 import { PROVISIONAL_VERSION, createStubResult, validateResult } from '../src/contract.js'
 import { clearLaunches, getLaunch } from '../src/launchStore.js'
@@ -41,9 +43,13 @@ test('maps the ltijs v7 user, platform and launch fields', () => {
   assert.equal(launch.contractVersion, PROVISIONAL_VERSION)
 })
 
-test('minimal local launch falls back to resource and serializes absent optional values as null', () => {
+test('minimal local launch uses configured mapping and serializes absent optional values as null', t => {
+  const old = config.activityResourceMap
+  t.after(() => { config.activityResourceMap = old })
+  config.activityResourceMap = { 'resource-1': 'activity-1' }
   const launch = normalizeLaunch({ sub: 'student-1', resourceLink: { id: 'resource-1' } })
-  assert.equal(launch.activityId, 'resource-1')
+  assert.equal(launch.activityId, 'activity-1')
+  assert.equal(launch.resource.id, 'resource-1')
   assert.deepEqual(JSON.parse(JSON.stringify(launch.course)), { id: null, label: null, title: null })
   assert.equal(launch.user.name, null)
   assert.equal(launch.resource.title, null)

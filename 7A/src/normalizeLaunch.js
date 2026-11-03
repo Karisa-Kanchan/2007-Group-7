@@ -1,5 +1,7 @@
+
 import { randomUUID } from 'node:crypto'
 import { PROVISIONAL_VERSION } from './contract.js'
+import { config } from './config.js'
 
 function firstDefined(...values) {
   return values.find(
@@ -12,82 +14,64 @@ function firstDefined(...values) {
 
 export function normalizeLaunch(rawLaunch) {
   if (!rawLaunch || typeof rawLaunch !== 'object' || Array.isArray(rawLaunch)) {
-    throw new Error(
-      'Launch payload is missing or invalid.'
-    )
+    throw new Error('Launch payload is missing or invalid.')
   }
 
-  const userId = firstDefined(
-    rawLaunch.sub,
-    rawLaunch.user?.id
-  )
-
-  const resourceLinkId = firstDefined(
-    rawLaunch.resourceLink?.id,
-    rawLaunch.resource?.id
-  )
+  const userId = firstDefined(rawLaunch.sub, rawLaunch.user?.id)
+  const resourceLinkId = firstDefined(rawLaunch.resourceLink?.id, rawLaunch.resource?.id)
 
   if (!userId) {
-    throw new Error(
-      'Launch does not contain a user identifier.'
-    )
+    throw new Error('Launch does not contain a user identifier.')
   }
 
   if (!resourceLinkId) {
-    throw new Error(
-      'Launch does not contain a resource link identifier.'
-    )
+    throw new Error('Launch does not contain a resource link identifier.')
   }
 
   const context = rawLaunch.context || {}
   const custom = rawLaunch.custom || {}
 
-  const activityId = firstDefined(
-    custom.activity_id,
-    rawLaunch.activityId,
-    resourceLinkId
-  )
+  if (custom.activity_id != null && typeof custom.activity_id !== 'string') {
+    throw new Error('Launch custom activity identifier must be text.')
+  }
+
+  const customActivityId =
+    typeof custom.activity_id === 'string'
+      ? custom.activity_id.trim()
+      : ''
+
+  const mappedActivityId =
+    typeof resourceLinkId === 'string' &&
+    Object.hasOwn(config.activityResourceMap, resourceLinkId)
+      ? config.activityResourceMap[resourceLinkId]
+      : null
+
+  const activityId = customActivityId || mappedActivityId
+
+  if (!activityId) {
+    throw new Error('Launch does not contain an activity identifier or a configured resource mapping.')
+  }
 
   return {
     contractVersion: PROVISIONAL_VERSION,
-
     launchId: randomUUID(),
-
     activityId,
-
     user: {
       id: userId,
-      name: firstDefined(
-        rawLaunch.name,
-        rawLaunch.user?.name,
-        null
-      )
+      name: firstDefined(rawLaunch.name, rawLaunch.user?.name, null)
     },
-
     course: {
       id: firstDefined(context.id, null),
       label: firstDefined(context.label, null),
       title: firstDefined(context.title, null)
     },
-
     resource: {
       id: resourceLinkId,
-      title: firstDefined(
-        rawLaunch.resourceLink?.title,
-        rawLaunch.resource?.title,
-        null
-      )
+      title: firstDefined(rawLaunch.resourceLink?.title, rawLaunch.resource?.title, null)
     },
-
     lti: {
-      issuer: firstDefined(
-        rawLaunch.iss,
-        null
-      ),
-
-      roles: Array.isArray(rawLaunch.roles)
-        ? rawLaunch.roles
-        : []
+      issuer: firstDefined(rawLaunch.iss, null),
+      roles: Array.isArray(rawLaunch.roles) ? rawLaunch.roles : []
     }
   }
 }
