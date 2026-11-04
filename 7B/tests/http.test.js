@@ -445,3 +445,48 @@ test('POST /launch returns HTTP 504 when the target times out', async (t) => {
     assert.equal(result.status, 504);
     assert.equal(result.body.error, 'Target request timed out');
 });
+
+test('POST /launch rejects malformed JSON from a target', async (t) => {
+    const baseUrl = await startServer(t);
+
+    mockTargetFetch(t, async () => new Response(
+        '{invalid-json',
+        {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        }
+    ));
+
+    const result = await postLaunch(baseUrl, validLaunch);
+
+    assert.equal(result.status, 502);
+    assert.equal(result.body.error, 'Target dispatch failed');
+});
+
+test('POST /launch rejects an empty target response', async (t) => {
+    const baseUrl = await startServer(t);
+
+    mockTargetFetch(t, async () => new Response(null, {
+        status: 200
+    }));
+
+    const result = await postLaunch(baseUrl, validLaunch);
+
+    assert.equal(result.status, 502);
+    assert.equal(result.body.error, 'Target dispatch failed');
+});
+
+test('POST /launch rejects a target result without status', async (t) => {
+    const baseUrl = await startServer(t);
+
+    mockTargetFetch(t, async () => Response.json({
+        launchId: validLaunch.launchId,
+        activityId: validLaunch.activityId,
+        userId: validLaunch.user.id
+    }));
+
+    const result = await postLaunch(baseUrl, validLaunch);
+
+    assert.equal(result.status, 502);
+    assert.equal(result.body.error, 'Target dispatch failed');
+});
