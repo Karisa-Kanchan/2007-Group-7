@@ -1,0 +1,23 @@
+{
+  "name": "project-7b-activity-registry-broker",
+  "version": "1.0.0",
+  "description": "ECNG2007 Project 7B Activity Registry and Target Broker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/*.test.js",
+    "start:digital-tutor": "node test-doubles/digitalTutor.js",
+    "start:vhdl-lab": "node test-doubles/webVhdlLab.js"
+  },
+  "keywords": [
+    "ECNG2007",
+    "LTI",
+    "activity-registry",
+    "target-broker"
+  ],
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}

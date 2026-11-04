@@ -1,0 +1,15 @@
+
+{
+  "activities": [
+    {
+      "id": "digital-logic-lesson",
+      "targetType": "digital-tutor",
+      "targetUrl": "http://localhost:4001"
+    },
+    {
+      "id": "vhdl-simulation",
+      "targetType": "web-vhdl-lab",
+      "targetUrl": "http://localhost:4002"
+    }
+  ]
+}
