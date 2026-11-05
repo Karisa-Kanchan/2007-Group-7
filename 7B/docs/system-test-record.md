@@ -8,13 +8,13 @@
 
 **Test basis:** *ECNG2007 Project 7 — System Test Baseline v0.0.1*, SYS-7B-01 through SYS-7B-09
 
-**Implementation contract:** `provisional-0` (joint 7A–7B design; final sign-off pending)
+**Implementation wire protocol:** `provisional-0` (later documented in [Shared Contract v0.0.1](../../docs/Project_7_Shared_Launch_Result_Contract_v0.0.1.docx) on 5 November 2026).
 
 **Execution environment:** Windows 11, Node.js/Express, 7B HTTP server on `localhost:3000`; Digital Tutor test double on `localhost:4001`; Web VHDL Lab test double on `localhost:4002`.
 
 ## Acceptance qualification
 
-The official baseline refers to an authoritative Learning Tool Launch/Result Contract v1, published launch/result examples and approved fixtures. These were not used in this execution. Consequently, the observations below constitute **provisional system-level evidence**, not final acceptance of the nine official baseline tests. Where behaviour was verified through returned responses rather than target-side request logging, that limitation is recorded.
+The system baseline was prepared against an anticipated authoritative Contract v1 and approved fixtures. The team-agreed Contract v0.0.1 was documented **after this 2 November execution**. Its adoption does not establish that approved fixtures or final combined-release conditions were used in this run. Consequently, the observations below constitute **provisional system-level evidence**, not final acceptance of the nine official baseline tests. Where behaviour was verified through returned responses rather than target-side request logging, that limitation is recorded.
 
 ## Baseline test coverage
 
@@ -52,11 +52,11 @@ Prior 7A development-harness integration used 7A `POST /dev/demo` with HTTP brok
 
 ## Remaining work before final baseline sign-off
 
-1. Agree and baseline the joint 7A–7B contract and official test fixtures; repeat or reconcile SYS-7B-01 through SYS-7B-09 against those inputs.
+1. Use the team-agreed shared Contract v0.0.1 and obtain any required approved test fixtures; repeat or reconcile SYS-7B-01 through SYS-7B-09 against the agreed expectations and the combined release revision.
 2. Capture direct target-side request evidence where required by the detailed SYS-7B-04/05 procedure.
 3. For SYS-7B-07, compare the normalised result against the approved expected result, not only the provisional schema.
 4. For SYS-7B-09, verify with the approved P7A-side test double or fixture; distinguish this from the unauthenticated 7A development harness.
 5. Independently measure the timeout duration (the observed 504 establishes timeout behaviour but not the exact 10-second interval).
-6. Re-run the full automated suite (`npm test` in `7B`) and record the output at the release checkpoint; earlier developer testing recorded 46 passing tests.
+6. Re-run the full automated suite (`npm test` in `7B`) and record the output at the release checkpoint. An **intermediate development revision** had 46 passing tests; a later separately recorded run at `ad4f459` had **57/57 passing**, with details in [`regression-test-record.md`](regression-test-record.md). Neither is automatically a final `main` result.
 
-**Overall disposition:** Provisional functional evidence obtained; **final formal baseline acceptance remains pending**.
+**Overall disposition:** Provisional functional evidence obtained; team-agreed interface rules are now documented, but **final formal baseline acceptance remains pending**. Refer to [`final-integration-checklist.md`](final-integration-checklist.md).
