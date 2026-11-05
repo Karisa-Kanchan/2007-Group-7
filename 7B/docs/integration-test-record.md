@@ -8,6 +8,8 @@
 
 **Test Environment:** Local Windows 11, Node.js v24.22.0
 
+> **Historical development test, executed 2 November 2026.** Do not read the statuses below as final validation of the 5 November 2026 team-agreed shared interface. See [final-integration-checklist.md](final-integration-checklist.md).
+
 ## 1. Objective
 
 To verify that Project 7A can communicate with the actual Project 7B Activity Registry & Target Broker through synchronous HTTP, route launches to the appropriate learning-tool test doubles, and receive correctly associated activity results.
@@ -29,7 +31,7 @@ The tests use 7A's development harness rather than a live authenticated Moodle s
 - `BROKER_MODE=http`
 - `BROKER_URL=http://localhost:3000`
 
-The shared Launch/Result Contract remained at `provisional-0`.
+The shared interface used on-wire `provisional-0`. The rules were subsequently recorded in the team-agreed [Shared Contract v0.0.1](../../docs/Project_7_Shared_Launch_Result_Contract_v0.0.1.docx) on 5 November 2026; this historic test was performed **before** that document baseline and was not rerun by that approval.
 
 ## 3. Integration Test Results
 
@@ -121,8 +123,8 @@ This incident demonstrates the importance of confirming service availability bef
 
 ## 6. Limitations and Outstanding Work
 
-- The Launch/Result Contract remains provisional until formally agreed by 7A and 7B.
-- The policy for mapping Moodle resource identifiers to internal activity identifiers remains under discussion.
+- **Historical qualification:** At the 2 November execution date the interface agreement had not yet been recorded in Contract v0.0.1. The later team agreement does not retroactively make these results a final contract-acceptance run.
+- **Historical qualification:** Resource-to-activity mapping was subsequently documented as a 7A responsibility in the shared contract; the latest mapped 7A implementation must be retested with 7B.
 - Tests were performed through 7A's unauthenticated development harness, not a complete live Moodle LTI workflow.
 - The `ltiDelivery` status was `blocked`; no result was sent to Moodle.
 - The official `SYS-7B-01` through `SYS-7B-09` system-test baseline has not yet been formally executed.
@@ -134,4 +136,4 @@ The integration tests demonstrate that the actual Project 7A development server 
 
 Both registered learning-tool target routes completed successfully, unknown activities were rejected, malformed launches were rejected by 7A, and successful results maintained their originating launch associations.
 
-The development integration is operational. Final contract approval, authenticated LTI integration and formal system-test execution remain outstanding.
+The development integration is operational. The interface rules were documented in the subsequent team-agreed Contract v0.0.1. **A new execution at the combined release revision**, authenticated LTI integration and formal system-test execution remain outstanding.

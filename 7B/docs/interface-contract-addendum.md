@@ -1,90 +1,36 @@
-# Project 7B: Interface Contract Addendum
+# Project 7B: Interface Contract Implementation Addendum
 
-**Status:** Agreed design, pending final contract version and sign-off
+**Component:** Activity Registry & Target Broker (7B)
+**Interface:** 7A → 7B normalised launch; 7B → 7A normalised result
+**Controlling shared document:** [`../../docs/Project_7_Shared_Launch_Result_Contract_v0.0.1.docx`](../../docs/Project_7_Shared_Launch_Result_Contract_v0.0.1.docx)
+**Team agreement:** 5 November 2026 (as documented in the supplied contract); formal release/system acceptance remains pending.
+**7B development evidence revision:** `ad4f459`
+**On-wire protocol value:** `provisional-0` (unchanged by approval of document v0.0.1)
 
-**Component:** Activity Registry & Target Broker
+This addendum records 7B's implemented responsibilities. It does not replace the shared contract or claim that the latest combined implementation has passed formal testing.
 
-**Interface:** Project 7A to Project 7B
+## Responsibilities
 
-## 1. Responsibility Boundary
+- 7A authenticates the LTI launch, resolves the *internal* `activityId` from an allowed custom value or configured resource mapping, and transmits the normalised JSON launch.
+- 7B validates that launch, looks up `activityId` in `config/activities.json`, dispatches the original launch to the configured target's `/launch`, validates/normalises the response, and returns it to 7A.
+- `resource.id` identifies the LMS resource; it is **not** a 7B registry lookup fallback.
+- 7B does not authenticate the originating LTI token or perform Moodle grade passback. Do not expose the local development service without an agreed trust boundary.
 
-Project 7A is responsible for interpreting authenticated LTI launches and resolving Moodle resource identifiers to internal activity identifiers.
+## Implemented HTTP contract
 
-Project 7B receives a normalised launch containing the resolved `activityId`.
+- `POST /launch`, JSON, 7B default address `http://localhost:3000` (`PORT` configurable).
+- Required launch fields: `contractVersion: "provisional-0"`, non-blank `launchId`, `activityId`, `user.id`, `resource.id`. `user.name` may be omitted or null; extra contextual fields can pass through.
+- Registered development entries: `digital-logic-lesson` → `digital-tutor` at `http://localhost:4001`; `vhdl-simulation` → `web-vhdl-lab` at `http://localhost:4002`.
+- `200` normalised result fields: `contractVersion`, `launchId`, `activityId`, `userId`, `status` (`completed` / `incomplete` / `failed`), `message` (may be empty). These identifiers come from the originating launch; mismatching target-provided identifiers are rejected. The current interface does not provide a numeric score.
+- Errors at the 7B boundary: `400` invalid launch; `404` unregistered activity; `502` target failure/invalid target result; `504` target timeout (10-second outbound target deadline). A valid `status: "failed"` is still an activity result, not necessarily a transport error.
+- Inspection endpoints: `GET /health`, `GET /activities`, `GET /activities/:activityId`.
+- The shared contract does **not** standardise a machine-readable JSON error-body schema. Do not add one as an accepted requirement without a joint change.
 
-7B does not interpret Moodle-specific identifiers or maintain Moodle resource-to-activity mappings.
+## Evidence and open acceptance work
 
-## 2. Activity and Resource Identifiers
+- [`regression-test-record.md`](regression-test-record.md): 57 automated tests passed at commit `ad4f459` on Node.js v24.22.0, npm 11.19.1; no skipped or failed tests; clean working tree.
+- [`integration-test-record.md`](integration-test-record.md): successful 2 November development harness scenarios, not a current combined release acceptance run.
+- [`system-test-record.md`](system-test-record.md): provisional `SYS-7B-01`–`SYS-7B-09` observations.
+- [`final-integration-checklist.md`](final-integration-checklist.md): outstanding joint tests and evidence to capture with the selected `main` commit.
 
-- `activityId` identifies the internal learning activity.
-- `resource.id` preserves the originating LMS resource identifier.
-- 7B uses `activityId` for registry lookup and target dispatch.
-- 7B does not use `resource.id` as a fallback for activity resolution.
-- Unknown internal activity IDs are rejected with HTTP 404.
-
-## 3. Required Launch Fields
-
-The current provisional interface requires:
-
-- `contractVersion`
-- `launchId`
-- `activityId`
-- `user.id`
-- `resource.id`
-
-The currently implemented contract version is `provisional-0`.
-
-The `user.name` field is optional and may contain `null`.
-
-## 4. Result Structure
-
-A normalised result contains:
-
-- `contractVersion`
-- `launchId`
-- `activityId`
-- `userId`
-- `status`
-
-The `message` field is optional under the proposed contract.
-
-Supported statuses:
-
-- `completed`: Activity successfully completed.
-- `incomplete`: Activity not completed but not terminally failed.
-- `failed`: Activity encountered a terminal failure.
-
-The result must preserve its association with the originating launch, activity and user.
-
-## 5. HTTP Error Handling
-
-| Condition | HTTP Status |
-|---|---|
-| Invalid incoming launch | 400 |
-| Unregistered activity | 404 |
-| Target communication failure or invalid result | 502 |
-| Target timeout | 504 |
-
-An activity result with `status: failed` is an activity-level outcome, not necessarily an HTTP communication error.
-
-## 6. Integration Evidence
-
-Development integration was verified on 2 November 2026 using:
-
-- 7A development server on port 3001
-- 7B broker on port 3000
-- Digital Tutor test double on port 4001
-- Web VHDL Lab test double on port 4002
-
-Both target routes returned successful completion results through 7A's actual HTTP broker client.
-
-Unknown activities and malformed launches were also tested.
-
-See `integration-test-record.md` for execution details.
-
-## 7. Outstanding Items
-
-- Final shared contract version and joint sign-off.
-- Formal execution of the SYS-7B system-test baseline.
-- Verification against 7A's final activity-ID resolution implementation.
-- Final agreement on error-response propagation across the 7A–7B boundary.
+Approved interface rules have replaced the earlier *pending design agreement* wording. **Formal system-test acceptance remains pending**; do not convert provisional outcomes to formal passes without new execution evidence.
