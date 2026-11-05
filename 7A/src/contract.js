@@ -1,17 +1,18 @@
-// Local prototype only: replace with staff Contract v1 when supplied.
+// The signed Group 7 contract uses provisional-0 as its current on-wire version.
 export const PROVISIONAL_VERSION = 'provisional-0'
 
 function hasText(value) {
-  return (
-    typeof value === 'string' &&
-    value.trim().length > 0
-  )
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function isObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 export function validateLaunch(launch) {
   const errors = []
 
-  if (!launch || typeof launch !== 'object' || Array.isArray(launch)) {
+  if (!isObject(launch)) {
     return {
       valid: false,
       errors: ['Launch must be an object.']
@@ -30,11 +31,17 @@ export function validateLaunch(launch) {
     errors.push('activityId is required.')
   }
 
-  if (!launch.user || !hasText(launch.user.id)) {
+  if (!isObject(launch.user) || !hasText(launch.user.id)) {
     errors.push('user.id is required.')
+  } else if (
+    launch.user.name !== undefined &&
+    launch.user.name !== null &&
+    typeof launch.user.name !== 'string'
+  ) {
+    errors.push('user.name must be text or null when supplied.')
   }
 
-  if (!hasText(launch.resource?.id)) {
+  if (!isObject(launch.resource) || !hasText(launch.resource.id)) {
     errors.push('resource.id is required.')
   }
 
@@ -47,7 +54,7 @@ export function validateLaunch(launch) {
 export function validateResult(result) {
   const errors = []
 
-  if (!result || typeof result !== 'object' || Array.isArray(result)) {
+  if (!isObject(result)) {
     return {
       valid: false,
       errors: ['Result must be an object.']
@@ -66,24 +73,18 @@ export function validateResult(result) {
     errors.push('activityId is required.')
   }
 
-  if (result.userId !== undefined && !hasText(result.userId)) {
-    errors.push('userId must be non-empty text when supplied.')
+  if (!hasText(result.userId)) {
+    errors.push('userId is required.')
   }
 
   if (result.message !== undefined && typeof result.message !== 'string') {
     errors.push('message must be text when supplied.')
   }
 
-  const allowedStatuses = [
-    'completed',
-    'incomplete',
-    'failed'
-  ]
+  const allowedStatuses = ['completed', 'incomplete', 'failed']
 
   if (!allowedStatuses.includes(result.status)) {
-    errors.push(
-      `status must be one of: ${allowedStatuses.join(', ')}.`
-    )
+    errors.push(`status must be one of: ${allowedStatuses.join(', ')}.`)
   }
 
   return {
