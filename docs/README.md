@@ -1,23 +1,36 @@
 # Project 7 shared interface documentation
 
-## Contract baseline
+## Approved contract baseline
 
-- [Shared Launch/Result Interface Contract v0.0.1](Project_7_Shared_Launch_Result_Contract_v0.0.1.docx) is the **team-agreed interface document** supplied on 5 November 2026. The original file is preserved unchanged here; it documents the wire value `contractVersion: "provisional-0"`.
-- Approval of interface rules is **not** evidence of final 7A–7B integration, LMS grade return, or formal SYS-7B acceptance. These are separate verification steps.
-- `7B/docs/interface-contract-addendum.md` describes the 7B implementation and its boundary with 7A; the shared contract controls if wording differs.
+The [Shared Launch/Result Interface Contract v0.0.1](Project_7_Shared_Launch_Result_Contract_v0.0.1.docx) is the team-agreed document supplied on 5 November 2026. The approved copy is retained unchanged. Its **document** version `v0.0.1` is distinct from the implemented on-wire value `contractVersion: "provisional-0"`.
 
-## Release and evidence records
+Contract agreement defines interface expectations. It does not by itself prove authenticated Moodle integration, approved result delivery, or formal system acceptance. The 7B-specific [interface implementation addendum](../7B/docs/interface-contract-addendum.md) describes the implemented boundary; the approved shared contract governs in case of disagreement.
 
-- `7B/docs/integration-test-record.md`: 2 November **historical development-harness** integration; not a final authenticated Moodle/7A–7B run.
-- `7B/docs/system-test-record.md`: provisional system test observations, with missing formal acceptance evidence noted.
-- `7B/docs/regression-test-record.md`: confirmed 57/57 development regression against 7B commit `ad4f459`.
-- `7B/docs/final-integration-checklist.md`: coordinated release verification and evidence capture checklist.
+## Current development verification
 
-## Editorial items to resolve in the document's next revision
+| Evidence | Confirmed scope | Status |
+|---|---|---|
+| [7B regression test record](../7B/docs/regression-test-record.md) | 60/60 automated tests on `fix-7b-contract-validation`, commit `6450d0c` | **Passed, pre-merge** |
+| [7A–7B integration test record](../7B/docs/integration-test-record.md) | 7/7 development-endpoint integration scenarios with actual 7B and learning-tool test doubles | **Passed, pre-merge** |
+| [7B system test record](../7B/docs/system-test-record.md) | Provisional `SYS-7B` observations | **Formal acceptance outstanding** |
+| [Final integration checklist](../7B/docs/final-integration-checklist.md) | Remaining joint release verification | **Open** |
 
-1. In Section 13, the agreement date reads `05/11/22026`; this is evidently a typo for `05/11/2026` and should be corrected in a **controlled new document revision** (not by silently modifying the approved copy).
-2. Section 13's repository/contract commit and P7A integration revision rows contain **instructions for future entries**, not actual commit/evidence values. Replace them with verified values during a documented revision.
-3. Section 5's custom activity ID fallback wording should be confirmed by the 7A owner against the exact implementation, especially the difference between an absent and an invalid present value.
-4. The file version `v0.0.1` is distinct from the on-wire protocol identifier `provisional-0`; changing the latter requires coordinated code and test changes.
+The earlier 57/57 regression execution on commit `ad4f459` and earlier 7A development-harness runs are historical records; they are not the latest 7B validation result. The seven newer tests confirm the development HTTP pathway, **not** an authenticated LMS launch.
 
-Any required lecturer/TA approval remains separate from team-level technical agreement.
+For setup and component-specific detail, see [7A README](../7A/README.md), [7B documentation](../7B/docs/README.md) and the [repository README](../README.md).
+
+## Outstanding authenticated LTI acceptance
+
+- Bring up 7A's `npm run lti` provider with MongoDB, secure platform registration and an approved externally reachable HTTPS endpoint.
+- Configure an approved Moodle/reference platform and exercise real LTI 1.3 launches for both activities.
+- Confirm the course-approved LTI-facing result operation. The development flow currently reports `ltiDelivery.status: "blocked"`; no LMS-facing result/grade delivery is claimed.
+- Execute the official system-test baseline and record approvals, environment, revisions and evidence for the final merged build.
+
+## Controlled document revision items
+
+1. Section 13 of the preserved approved contract contains `05/11/22026`; correct this in a controlled **new revision**, not by silently changing the approved artefact.
+2. Section 13's repository/contract commit and P7A integration revision rows contain future-entry instructions rather than verified entries. Enter audited revision values in the next document revision.
+3. The fallback wording for `custom.activity_id` should be confirmed with the 7A owner, particularly absent versus invalid supplied values.
+4. Changing the on-wire `provisional-0` identifier requires coordinated contract, code, fixture and test updates.
+
+Any lecturer/TA acceptance remains separate from team technical agreement.
