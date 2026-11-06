@@ -8,12 +8,6 @@ The team-agreed specification is [Project 7 Shared Launch/Result Interface Contr
 
 For configuration and component-specific instructions, see the source folders and [7B documentation](7B/docs/README.md). Historical test evidence and a joint verification checklist are linked there.
 
-## Current evidence limitations
-
-- 7B development regression: 57 tests passed at commit `ad4f459` (historical source revision, not a newly confirmed combined release test).
-- Prior 7A development-harness to 7B integration was demonstrated using the two target test doubles.
-- Final integration at the selected shared `main` revision, the formal `SYS-7B` baseline, and LMS-facing result/grade delivery require separate verification and evidence.
-
 ## Documentation ownership
 
 The shared contract is repository-wide. Each team owns the accuracy of its component documents and unit tests; changes to the 7A implementation or its assumptions should be reviewed by 7A. Neither the LTI-facing grade-delivery path nor the external production learning tools are claimed complete here.
