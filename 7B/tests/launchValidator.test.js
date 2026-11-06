@@ -29,7 +29,9 @@ test('rejects a missing contract version', () => {
     const result = validateLaunch(launch);
 
     assert.equal(result.valid, false);
-    assert.ok(result.errors.includes('contractVersion must be provisional-0.'));
+    assert.ok(
+        result.errors.includes('contractVersion must be provisional-0.')
+    );
 });
 
 test('rejects an invalid contract version', () => {
@@ -111,4 +113,51 @@ test('accepts a launch with a null user name', () => {
 
     assert.equal(result.valid, true);
     assert.deepEqual(result.errors, []);
+});
+
+test('accepts a launch with a string user name', () => {
+    const result = validateLaunch({
+        ...validLaunch,
+        user: {
+            id: 'student-123',
+            name: 'Demo Student'
+        }
+    });
+
+    assert.equal(result.valid, true);
+    assert.deepEqual(result.errors, []);
+});
+
+test('rejects a numeric optional user name', () => {
+    const result = validateLaunch({
+        ...validLaunch,
+        user: {
+            id: 'student-123',
+            name: 12345
+        }
+    });
+
+    assert.equal(result.valid, false);
+    assert.ok(
+        result.errors.includes(
+            'user.name must be a string or null when supplied.'
+        )
+    );
+});
+
+test('rejects an object as the optional user name', () => {
+    const result = validateLaunch({
+        ...validLaunch,
+        user: {
+            id: 'student-123',
+            name: { first: 'Demo' }
+        }
+    });
+
+    assert.equal(result.valid, false);
+    assert.ok(
+        result.errors.includes(
+            'user.name must be a string or null when supplied.'
+        )
+    );
 });
