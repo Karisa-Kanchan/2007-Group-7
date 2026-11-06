@@ -2,8 +2,8 @@
 /**
  * Validates incoming normalised launches from Project 7A.
  *
- * Uses the provisional-0 format currently implemented by 7A.
- * These rules must be reviewed when the teams approve Contract v1.
+ * Enforces the shared Launch/Result Interface Contract v0.0.1.
+ * The supported wire version remains provisional-0.
  */
 
 const PROVISIONAL_VERSION = 'provisional-0';
@@ -41,6 +41,18 @@ function validateLaunch(launch) {
 
     if (!hasText(launch.user?.id)) {
         errors.push('user.id is required.');
+    }
+
+    // user.name is optional, but must be a string or null when supplied.
+    if (
+        launch.user &&
+        typeof launch.user === 'object' &&
+        !Array.isArray(launch.user) &&
+        launch.user.name !== undefined &&
+        launch.user.name !== null &&
+        typeof launch.user.name !== 'string'
+    ) {
+        errors.push('user.name must be a string or null when supplied.');
     }
 
     if (!hasText(launch.resource?.id)) {
