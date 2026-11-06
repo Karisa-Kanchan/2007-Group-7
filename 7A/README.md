@@ -1,4 +1,3 @@
-
 # ECNG2007 Project 7A: LTI Protocol Adapter
 
 Project 7A (P7A) is the LTI Protocol Adapter component of ECNG2007 Project 7: LTI Learning Tool Integration.
@@ -7,9 +6,9 @@ P7A receives an approved LTI 1.3 launch, maps it to a normalized launch context 
 
 This directory contains a **working local prototype** developed using Node.js 24, Express, ltijs 7, and MongoDB. The prototype supports local testing and a simulated P7A-to-P7B exchange. It does not yet implement the course-approved LTI-facing result return.
 
-The supplied Software Requirements Specification (SRS) and System Test Baseline govern the project requirements. At the time of this prototype revision, the final Learning Tool Launch/Result Contract v1, approved launch/result examples, and approved consumer/result route had not been supplied.
+The supplied Software Requirements Specification (SRS) and System Test Baseline govern the project requirements. The teams have since agreed on the [Shared Launch/Result Interface Contract v0.0.1](../docs/Project_7_Shared_Launch_Result_Contract_v0.0.1.docx). Its document version is `v0.0.1`, while the implemented on-wire `contractVersion` remains `provisional-0`.
 
-Consequently, the local P7A/P7B message fields and HTTP routes are provisional. No official SYS-7A system test is reported as passed.
+On 5 November 2026 (Trinidad and Tobago local time), 7A and the actual 7B broker passed seven development-endpoint integration scenarios with the Digital Tutor and Web VHDL Lab test doubles. See the [integration test record](../7B/docs/integration-test-record.md). This does not constitute an authenticated Moodle launch, approval of an LMS-facing result path, or completion of official SYS-7A system acceptance.
 
 For further information, see:
 
@@ -67,7 +66,7 @@ The following software is required:
 
 The required Node.js version is also recorded in `.node-version`.
 
-The local mock demonstration does not require MongoDB, Moodle, a real P7B service, or the Digital Tutor/Web VHDL Lab applications.
+The **stub-mode** local demonstration does not require MongoDB, Moodle, a real P7B service, or the Digital Tutor/Web VHDL Lab applications. The integrated HTTP demonstration does require the 7B broker and target test doubles.
 
 ## 3. Setup and Local Demonstration
 
@@ -280,9 +279,7 @@ BROKER_URL=<configured broker address>
 
 The current development implementation uses `POST /launch` and expects a JSON result in the HTTP response.
 
-These transport conventions are local assumptions and are not confirmed as Learning Tool Launch/Result Contract v1.
-
-The actual P7B integration must be updated or verified against the approved shared contract and the interface agreed upon by both subprojects.
+These transport conventions are reflected in the team-agreed shared Contract v0.0.1. The latest pre-merge development integration on 5 November 2026 successfully exercised the actual P7B service and two learning-tool test doubles. Authenticated Moodle launch processing and LTI-facing result delivery still require separate verification.
 
 The mock development server also provides:
 
@@ -293,6 +290,31 @@ POST /api/results
 This allows separately supplied normalized results to be tested in mock mode.
 
 P7A does not perform P7B's internal registry lookup, activity routing, or target-result normalization.
+
+### 5.3 Verified HTTP Integration with Project 7B (Windows CMD)
+
+For the pre-merge integration demonstration, run the Digital Tutor (`npm run start:digital-tutor`), Web VHDL Lab (`npm run start:vhdl-lab`) and 7B broker (`npm start`) in separate CMD terminals from `7B/`. They listen on ports 4001, 4002 and 3000 respectively.
+
+In the `7A/` CMD terminal, start the **development server** (not the authenticated LTI provider):
+
+```cmd
+set PORT=3001
+set BROKER_MODE=http
+set BROKER_URL=http://localhost:3000
+npm start
+```
+
+In another terminal, submit a development launch:
+
+```cmd
+curl.exe -i -X POST http://localhost:3001/dev/demo -H "Content-Type: application/json" -d "{\"sub\":\"student-demo\",\"resourceLink\":{\"id\":\"resource-demo-001\"},\"custom\":{\"activity_id\":\"digital-logic-lesson\"}}"
+```
+
+For the Web VHDL Lab, use `custom.activity_id` of `vhdl-simulation` with a different `resourceLink.id`. The development endpoint expects the source-style `sub`, `resourceLink.id` and `custom.activity_id` fields, not merely a top-level `activityId`.
+
+A successful development response includes matching identifiers in `normalizedLaunch` and `normalizedResult`, with `normalizedResult.status: "completed"`. Its `ltiDelivery.status: "blocked"` is expected: **no result was returned to Moodle**. In seven observed development scenarios, both happy-path launches and five negative/failure cases passed. See [7B integration evidence](../7B/docs/integration-test-record.md).
+
+This HTTP integration test does **not** exercise a signed LTI 1.3 launch. For authenticated platform testing, start MongoDB and use `npm run lti` as described below, with an approved HTTPS-reachable endpoint and platform registration.
 
 ## 6. MongoDB and the LTI Provider
 
@@ -559,7 +581,7 @@ The official tests are:
 | SYS-7A-06 | Translate Result Through Approved LTI-Facing Path |
 | SYS-7A-07 | Preserve Originating Launch/Activity Association |
 
-These official test cases remain unexecuted until the required approved fixtures, shared contract, and test environment are available.
+The shared contract document is now agreed, but these official system test cases are **not** reported as passed. Approved authenticated LTI test inputs, the LMS-facing result mechanism, and formal acceptance evidence are still outstanding.
 
 P7A must remain independently testable using the approved LTI consumer/reference route and the approved P7B-side test double.
 
@@ -569,16 +591,16 @@ Joint integration testing will additionally require the actual P7B implementatio
 
 The following work must be completed or confirmed before reporting full compliance with the course requirements:
 
-1. Obtain the approved Learning Tool Launch/Result Contract v1.
-2. Replace or verify provisional normalized message fields and types.
-3. Confirm the approved transport and response conventions at the P7A/P7B boundary.
-4. Obtain the official launch and result fixtures.
+1. Preserve the team-agreed Shared Launch/Result Contract v0.0.1 and obtain any separately required course-staff approval or subsequent contract revision.
+2. Verify implementation conformance with the agreed contract and its on-wire `provisional-0` identifier.
+3. Confirm any further changes to transport and response conventions with both teams.
+4. Obtain the official authenticated launch and result fixtures.
 5. Configure and verify the approved LTI test consumer.
 6. Confirm the required completion, status, and score semantics.
 7. Implement the approved LTI-facing result operation.
 8. Verify that each returned result corresponds to its originating launch and activity.
-9. Integrate P7A with the actual P7B implementation.
-10. Execute and document the approved system and integration tests.
+9. Retain and reverify the **completed development** P7A-to-actual-P7B integration on the final merged build.
+10. Execute and document the **authenticated** LMS integration and official system tests.
 11. Update documentation, requirement traceability, and test evidence using the final approved contract.
 
 The implementation should not introduce unsupported requirements merely to complete these items.
