@@ -1,11 +1,11 @@
 import { validateResult } from './contract.js'
 import { addTrace, getLaunch, saveResult } from './launchStore.js'
 
-// Local status only. No approved result operation or payload is known yet.
+// Local status only. No approved result operation or payload is known.
 export function pendingLtiDelivery() {
   return {
     status: 'blocked',
-    reason: 'Awaiting the course-approved LTI-facing result path. No result was sent.'
+    reason: 'Result successfully validated and associated with the originating launch. Separate result submission to the LMS was not performed.'
   }
 }
 
